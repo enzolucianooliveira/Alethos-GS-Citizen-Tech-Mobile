@@ -11,7 +11,7 @@ import { analisarTexto } from './analisador';
 import { ATRASO_MOCK_MS, SIMULAR_FALHA } from './config';
 import type { ApiCliente } from './tipos';
 
-const CHAVE_BANCO = '@antigolpe/banco-mock/v1';
+const CHAVE_BANCO = '@alethos/banco-mock/v1';
 
 interface Banco {
   analises: Analise[];

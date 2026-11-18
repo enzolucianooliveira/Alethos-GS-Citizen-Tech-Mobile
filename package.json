@@ -1,27 +1,27 @@
 {
-  "name": "antigolpe-mobile",
+  "name": "alethos-mobile",
   "version": "1.0.0",
-  "description": "App mobile da CitizenTech Antigolpe: ajuda idosos a reconhecer golpes e pedir confirmação à família.",
+  "description": "Alethos, guardião antigolpe: ajuda idosos a reconhecer golpes e pedir confirmação à família.",
   "authors": [
     {
       "name": "Enzo Luciano Barros De Oliveira",
       "rm": "559557"
     },
     {
-      "name": "NOME DO INTEGRANTE 2",
-      "rm": "RM000000"
+      "name": "Alexandre Colvet Delfino",
+      "rm": "RM560059"
     },
     {
-      "name": "NOME DO INTEGRANTE 3",
-      "rm": "RM000000"
+      "name": "Luigi Thiengo",
+      "rm": "RM560755"
     },
     {
-      "name": "NOME DO INTEGRANTE 4",
-      "rm": "RM000000"
+      "name": "Pedro Scarceli",
+      "rm": "RM561023"
     },
     {
-      "name": "NOME DO INTEGRANTE 5",
-      "rm": "RM000000"
+      "name": "Witalon Rodrigues",
+      "rm": "RM559023"
     }
   ],
   "main": "index.ts",

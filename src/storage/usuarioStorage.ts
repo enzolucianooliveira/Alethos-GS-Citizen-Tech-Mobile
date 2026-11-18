@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Usuario } from '../types';
 import { ehUsuario } from '../types/guards';
 
-const CHAVE_USUARIO = '@antigolpe/usuario/v1';
+const CHAVE_USUARIO = '@alethos/usuario/v1';
 
 export async function salvarUsuario(usuario: Usuario): Promise<void> {
   // O AsyncStorage só guarda texto, então o objeto vira JSON.

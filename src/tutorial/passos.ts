@@ -19,7 +19,7 @@ export const TUTORIAIS = {
   identificacao: [
     {
       titulo: 'Oi! Eu sou o Gui 👋',
-      texto: 'Sou o guardião deste app. Vou mostrar rapidinho para que serve cada parte. Toque na tela para passar mais rápido.',
+      texto: 'Sou o guardião do Alethos. Vou mostrar rapidinho para que serve cada parte. Toque na tela para passar mais rápido.',
     },
     {
       alvo: 'campo-nome',

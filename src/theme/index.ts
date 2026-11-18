@@ -1,4 +1,4 @@
-// Identidade visual do Antigolpe. Todas as cores, fontes e medidas ficam aqui.
+// Identidade visual do Alethos. Todas as cores, fontes e medidas ficam aqui.
 //
 // Pensado para idosos:
 // - Atkinson Hyperlegible no texto: fonte criada pelo Braille Institute para

@@ -55,8 +55,8 @@ export function IdentificacaoScreen() {
       topo={
         <Cabecalho
           semBarra
-          titulo="Antigolpe"
-          subtitulo="Desconfie antes de agir. Confira a mensagem e chame a família antes de mandar dinheiro."
+          titulo="Alethos"
+          subtitulo="Seu guardião antigolpe. Confira a mensagem e chame a família antes de mandar dinheiro."
           ilustracao={<Gui tamanho={104} />}
           aoPedirDicas={rever}
         />

@@ -1,10 +1,10 @@
-# Antigolpe: app mobile
+# Alethos: guardião antigolpe (app mobile)
 
 ## Ficha da CitizenTech
 
 | Campo | Resposta |
 | --- | --- |
-| Nome da CitizenTech | Antigolpe *(ajustem o nome da equipe)* |
+| Nome da CitizenTech | Alethos: guardião antigolpe |
 | Cidade e bairro | São Paulo, *(bairro da pessoa entrevistada)* |
 | Cidadão beneficiado | Idosos que usam celular e suas famílias |
 | Problema | Idosos recebem mensagens de golpe (falso parente, falsa central, link falso) e não têm a quem perguntar na hora de decidir se transferem dinheiro. |

@@ -1,4 +1,4 @@
-// "Gui, o guardião": mascote original do Antigolpe, desenhado em SVG.
+// "Gui, o guardião": mascote original do Alethos, desenhado em SVG.
 // É ele quem fala com a pessoa no tutorial.
 
 import Svg, { Circle, Defs, Ellipse, LinearGradient, Path, Stop } from 'react-native-svg';

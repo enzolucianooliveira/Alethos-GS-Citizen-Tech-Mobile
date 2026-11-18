@@ -2,7 +2,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CHAVE = '@antigolpe/tutoriais-vistos/v1';
+const CHAVE = '@alethos/tutoriais-vistos/v1';
 
 function ehListaDeTextos(valor: unknown): valor is string[] {
   return Array.isArray(valor) && valor.every((item) => typeof item === 'string');
