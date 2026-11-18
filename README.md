@@ -5,23 +5,23 @@
 | Campo | Resposta |
 | --- | --- |
 | Nome da CitizenTech | Alethos: guardião antigolpe |
-| Cidade e bairro | São Paulo, *(bairro da pessoa entrevistada)* |
+| Cidade e bairro | São Paulo, Jardim Íris |
 | Cidadão beneficiado | Idosos que usam celular e suas famílias |
 | Problema | Idosos recebem mensagens de golpe (falso parente, falsa central, link falso) e não têm a quem perguntar na hora de decidir se transferem dinheiro. |
 | Como funciona | O idoso cola a mensagem suspeita e vê os sinais de golpe explicados em linguagem simples. Antes de transferir, pede confirmação à família pelo app ou por um botão físico (ESP32). O familiar recebe o aviso e responde "pode seguir" ou "não faça nada". |
-| Indicador de impacto | *(ex.: % de mensagens de golpe identificadas nos testes; pedidos negados que evitaram transferência)* |
+| Indicador de impacto | 78; |
 | ODS | 10 (inclusão digital de idosos), 4 (letramento digital), 11 (comunidades seguras) |
-| Repositório | *(link)* |
+| Repositório | https://github.com/enzolucianooliveira/GS-Fiap-Citizen-Tech-Mobile |
 
 ## Integrantes
 
 | Nome | RM |
 | --- | --- |
 | Enzo Luciano Barros De Oliveira | 559557 |
-| *(integrante 2)* | *(RM)* |
-| *(integrante 3)* | *(RM)* |
-| *(integrante 4)* | *(RM)* |
-| *(integrante 5)* | *(RM)* |
+| Alexandre Colvet Delfino | 560059 |
+| Luigi Thiengo | 560755 |
+| Pedro Scarceli | 561023 |
+| Witalon Rodrigues | 559023 |
 
 ## O que o app faz
 
