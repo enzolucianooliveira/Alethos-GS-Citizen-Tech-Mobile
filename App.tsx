@@ -1,20 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { UsuarioProvider } from './src/contexts/UsuarioContext';
+import { AppNavigator } from './src/navigation/AppNavigator';
+import { configurarNotificacoes } from './src/services/notificacoes';
+
+// Define, uma única vez, como as notificações aparecem com o app aberto.
+configurarNotificacoes();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Ni**as</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <UsuarioProvider>
+        <AppNavigator />
+        <StatusBar style="dark" />
+      </UsuarioProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
