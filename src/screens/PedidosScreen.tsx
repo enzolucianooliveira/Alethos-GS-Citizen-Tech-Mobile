@@ -2,13 +2,15 @@
 // avisa com notificação local quando chega um pedido novo.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import { AvisoPermissao } from '../components/AvisoPermissao';
 import { BotaoGrande } from '../components/BotaoGrande';
 import { CartaoPedido } from '../components/Cartoes';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../components/Estados';
-import { Paragrafo, RodapeUsuario } from '../components/Layout';
+import { FamiliaUnida } from '../components/ilustracoes/Cenas';
+import { Bloco, Cabecalho, FundoColorido, RodapeUsuario } from '../components/Layout';
+import { Texto } from '../components/Texto';
 import { useUsuarioLogado } from '../contexts/UsuarioContext';
 import { useCarregamento } from '../hooks/useCarregamento';
 import { usePermissaoNotificacao } from '../hooks/usePermissaoNotificacao';
@@ -16,7 +18,10 @@ import { api, USAR_MOCK } from '../services/api';
 import { INTERVALO_CONSULTA_MS } from '../services/config';
 import { simularBotaoDoDispositivo } from '../services/mockApi';
 import { notificarPedido } from '../services/notificacoes';
-import { cores, espaco, fonte } from '../theme';
+import { cores, espaco } from '../theme';
+import { useTema } from '../theme/useTema';
+import { AlvoTutorial } from '../tutorial/AlvoTutorial';
+import { useTutorialDaTela } from '../tutorial/useTutorialDaTela';
 import type { Pedido, RespostaPedido } from '../types';
 import { mensagemDeErro } from '../utils';
 
@@ -24,9 +29,11 @@ const pendentes = (pedidos: Pedido[]) => pedidos.filter((p) => p.status === 'pen
 
 export function PedidosScreen() {
   const usuario = useUsuarioLogado();
+  const tema = useTema();
   const carregar = useCallback(() => api.listarPedidos(), []);
   const { estado, tentarDeNovo, substituirDados } = useCarregamento(carregar);
   const permissao = usePermissaoNotificacao();
+  const { rever } = useTutorialDaTela('pedidos', estado.status === 'sucesso' && permissao.situacao !== 'verificando');
 
   const [respondendoId, setRespondendoId] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -45,12 +52,11 @@ export function PedidosScreen() {
     async function verificar() {
       try {
         const pedidos = await api.listarPedidos();
-        const idsPendentes = pendentes(pedidos).map((p) => p.id);
         const conhecidos = vistos.current;
 
         if (conhecidos === null) {
           // Primeira consulta: o que já existe não é "novo", só marcamos como visto.
-          vistos.current = new Set(idsPendentes);
+          vistos.current = new Set(pendentes(pedidos).map((p) => p.id));
         } else {
           const novos = pendentes(pedidos).filter((p) => !conhecidos.has(p.id));
           for (const pedido of novos) {
@@ -87,7 +93,7 @@ export function PedidosScreen() {
     setAviso(null);
     try {
       await simularBotaoDoDispositivo();
-      setAviso(`Pedido simulado. Ele aparece aqui em até ${INTERVALO_CONSULTA_MS / 1000} segundos.`);
+      setAviso(`Pedido simulado! Ele chega aqui em até ${INTERVALO_CONSULTA_MS / 1000} segundos.`);
     } catch (erro: unknown) {
       setAviso(mensagemDeErro(erro));
     }
@@ -96,62 +102,98 @@ export function PedidosScreen() {
   if (estado.status === 'carregando') return <EstadoCarregando mensagem="Buscando pedidos..." />;
   if (estado.status === 'erro') return <EstadoErro mensagem={estado.mensagem} aoTentarDeNovo={tentarDeNovo} />;
 
-  const quantosPendentes = pendentes(estado.dados).length;
+  const quantos = pendentes(estado.dados).length;
 
   return (
-    <FlatList
-      data={estado.dados}
-      keyExtractor={(pedido) => pedido.id}
-      renderItem={({ item }) => (
-        <CartaoPedido
-          pedido={item}
-          respondendo={respondendoId === item.id}
-          aoResponder={(resposta) => void responder(item, resposta)}
-        />
-      )}
-      ListHeaderComponent={
-        <View style={styles.topo}>
-          <Paragrafo>
-            Olá, {usuario.nome}.{' '}
-            {quantosPendentes > 0
-              ? `Há ${quantosPendentes} pedido(s) esperando sua resposta.`
-              : 'Nenhum pedido esperando resposta agora.'}
-          </Paragrafo>
-          <AvisoPermissao
-            situacao={permissao.situacao}
-            aoPedir={() => void permissao.pedir()}
-            aoAbrirConfiguracoes={() => void permissao.abrirConfiguracoes()}
-          />
-          {aviso ? <Text style={styles.aviso}>{aviso}</Text> : null}
-        </View>
-      }
-      ListEmptyComponent={
-        <EstadoVazio
-          titulo="Nenhum pedido por enquanto"
-          mensagem="Quando seu familiar pedir uma confirmação, pelo app ou pelo botão em casa, ela aparece aqui."
-        />
-      }
-      ListFooterComponent={
-        <View>
-          {USAR_MOCK ? (
-            <View style={styles.demo}>
-              <Paragrafo suave>Modo demonstração (sem o ESP32 ligado):</Paragrafo>
-              <BotaoGrande titulo="Simular botão físico" variante="secundario" onPress={() => void simular()} />
+    <FundoColorido>
+      <FlatList
+        data={estado.dados}
+        keyExtractor={(pedido) => pedido.id}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <CartaoPedido
+              pedido={item}
+              respondendo={respondendoId === item.id}
+              aoResponder={(resposta) => void responder(item, resposta)}
+            />
+          </View>
+        )}
+        ListHeaderComponent={
+          <View style={styles.topo}>
+            <Cabecalho
+              semBarra
+              titulo={`Olá, ${usuario.nome}!`}
+              subtitulo="Você é o protetor da família. Confira cada pedido com calma."
+              ilustracao={<FamiliaUnida tamanho={120} />}
+              aoPedirDicas={rever}
+            />
+            <View style={styles.conteudo}>
+              <AlvoTutorial id="resumo-pedidos">
+                <Bloco destaque={quantos > 0 ? cores.atencao : undefined}>
+                  <View style={styles.resumo}>
+                    <Texto variante="enorme" cor={quantos > 0 ? cores.atencao : tema.principal}>
+                      {quantos}
+                    </Texto>
+                    <Texto variante="destaque" style={styles.flex}>
+                      {quantos === 1 ? 'pedido esperando sua resposta' : 'pedidos esperando sua resposta'}
+                    </Texto>
+                  </View>
+                </Bloco>
+              </AlvoTutorial>
+
+              {permissao.situacao !== 'verificando' ? (
+                <AlvoTutorial id="aviso-permissao">
+                  <AvisoPermissao
+                    situacao={permissao.situacao}
+                    aoPedir={() => void permissao.pedir()}
+                    aoAbrirConfiguracoes={() => void permissao.abrirConfiguracoes()}
+                  />
+                </AlvoTutorial>
+              ) : null}
+
+              {aviso ? <Texto variante="destaque">{aviso}</Texto> : null}
+
+              <AlvoTutorial id="lista-pedidos">
+                <Texto variante="subtitulo">Pedidos recebidos</Texto>
+              </AlvoTutorial>
             </View>
-          ) : null}
-          <RodapeUsuario />
-        </View>
-      }
-      contentContainerStyle={styles.lista}
-      ItemSeparatorComponent={() => <View style={styles.separador} />}
-    />
+          </View>
+        }
+        ListEmptyComponent={
+          <EstadoVazio
+            titulo="Nenhum pedido por enquanto"
+            mensagem="Quando seu familiar pedir uma confirmação, pelo app ou pelo botão em casa, ela aparece aqui."
+            ilustracao={<FamiliaUnida tamanho={130} />}
+          />
+        }
+        ListFooterComponent={
+          <View style={styles.conteudo}>
+            {USAR_MOCK ? (
+              <AlvoTutorial id="botao-simular">
+                <Bloco>
+                  <Texto variante="legenda" cor={cores.textoSuave}>
+                    🧪 Modo demonstração: simula o botão físico (ESP32) sendo apertado em casa.
+                  </Texto>
+                  <BotaoGrande titulo="Simular botão físico" icone="🔘" variante="secundario" compacto onPress={() => void simular()} />
+                </Bloco>
+              </AlvoTutorial>
+            ) : null}
+            <RodapeUsuario />
+          </View>
+        }
+        contentContainerStyle={styles.lista}
+        ItemSeparatorComponent={() => <View style={styles.separador} />}
+      />
+    </FundoColorido>
   );
 }
 
 const styles = StyleSheet.create({
-  lista: { padding: espaco.medio, flexGrow: 1 },
-  topo: { gap: espaco.medio, marginBottom: espaco.grande },
+  flex: { flex: 1 },
+  lista: { flexGrow: 1, paddingBottom: espaco.enorme },
+  topo: { marginBottom: espaco.medio },
+  conteudo: { padding: espaco.medio, gap: espaco.medio },
+  resumo: { flexDirection: 'row', alignItems: 'center', gap: espaco.medio },
+  item: { paddingHorizontal: espaco.medio },
   separador: { height: espaco.medio },
-  aviso: { fontSize: fonte.pequena + 1, color: cores.texto, fontWeight: '600' },
-  demo: { marginTop: espaco.grande, gap: espaco.pequeno },
 });

@@ -2,36 +2,42 @@
 
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, raio } from '../theme';
+import { aparenciaVeredito, cores, espaco, raio, sombra } from '../theme';
+import { useTema } from '../theme/useTema';
 import { ORIGENS, type Analise, type Pedido, type RespostaPedido, type StatusPedido } from '../types';
 import { formatarDataHora, resumir } from '../utils';
 import { BotaoGrande } from './BotaoGrande';
 import { SeloVeredito } from './SeloVeredito';
+import { Texto } from './Texto';
 
-const rotuloOrigem = (valor: Analise['origem']) =>
-  ORIGENS.find((o) => o.valor === valor)?.rotulo ?? valor;
+const origemDe = (valor: Analise['origem']) => ORIGENS.find((o) => o.valor === valor);
 
 export function CartaoAnalise({ analise, aoTocar }: { analise: Analise; aoTocar: () => void }) {
+  const origem = origemDe(analise.origem);
+  const { cor } = aparenciaVeredito[analise.veredito];
   return (
     <Pressable
       onPress={aoTocar}
       accessibilityRole="button"
-      accessibilityHint="Abre os detalhes desta análise"
-      style={({ pressed }) => [styles.cartao, pressed && styles.pressionado]}
+      accessibilityHint="Abre o resultado completo desta análise"
+      style={({ pressed }) => [styles.cartao, { borderLeftColor: cor }, pressed && styles.pressionado]}
     >
-      <SeloVeredito veredito={analise.veredito} />
-      <Text style={styles.texto}>“{resumir(analise.texto, 90)}”</Text>
-      <Text style={styles.meta}>
-        {rotuloOrigem(analise.origem)} · {formatarDataHora(analise.criadaEm)}
-      </Text>
+      <View style={styles.linhaTopo}>
+        <SeloVeredito veredito={analise.veredito} />
+        <Text style={styles.seta}>›</Text>
+      </View>
+      <Texto>“{resumir(analise.texto, 90)}”</Texto>
+      <Texto variante="legenda" cor={cores.textoSuave}>
+        {origem?.icone} {origem?.rotulo ?? analise.origem} · {formatarDataHora(analise.criadaEm)}
+      </Texto>
     </Pressable>
   );
 }
 
-const APARENCIA_STATUS: Record<StatusPedido, { rotulo: string; cor: string; fundo: string }> = {
-  pendente: { rotulo: 'Aguardando resposta', cor: cores.atencao, fundo: cores.atencaoFundo },
-  aprovado: { rotulo: 'Você confirmou: pode seguir', cor: cores.sucesso, fundo: cores.sucessoFundo },
-  negado: { rotulo: 'Você pediu para não seguir', cor: cores.perigo, fundo: cores.perigoFundo },
+const APARENCIA_STATUS: Record<StatusPedido, { rotulo: string; icone: string; cor: string; fundo: string }> = {
+  pendente: { rotulo: 'Esperando sua resposta', icone: '⏳', cor: cores.atencao, fundo: cores.atencaoFundo },
+  aprovado: { rotulo: 'Você liberou: pode seguir', icone: '✅', cor: cores.sucesso, fundo: cores.sucessoFundo },
+  negado: { rotulo: 'Você barrou: era golpe', icone: '🛑', cor: cores.perigo, fundo: cores.perigoFundo },
 };
 
 export function CartaoPedido({
@@ -43,27 +49,42 @@ export function CartaoPedido({
   aoResponder: (resposta: RespostaPedido) => void;
   respondendo: boolean;
 }) {
+  const tema = useTema();
   const status = APARENCIA_STATUS[pedido.status];
+  const pendente = pedido.status === 'pendente';
+
   return (
-    <View style={[styles.cartao, pedido.status === 'pendente' && styles.cartaoDestaque]}>
-      <Text style={styles.titulo}>{pedido.idosoNome}</Text>
-      <Text style={styles.texto}>{pedido.descricao}</Text>
-      <Text style={styles.meta}>
-        {pedido.origem === 'dispositivo' ? 'Pelo botão físico' : 'Pelo app'} ·{' '}
-        {formatarDataHora(pedido.criadoEm)}
-      </Text>
-      <Text style={[styles.status, { color: status.cor, backgroundColor: status.fundo }]}>{status.rotulo}</Text>
-      {pedido.status === 'pendente' ? (
+    <View style={[styles.cartao, { borderLeftColor: pendente ? cores.atencao : tema.principal }]}>
+      <View style={styles.linhaTopo}>
+        <View style={[styles.avatar, { backgroundColor: tema.claro }]}>
+          <Text style={styles.avatarIcone}>{pedido.origem === 'dispositivo' ? '🔘' : '📲'}</Text>
+        </View>
+        <View style={styles.flex}>
+          <Texto variante="subtitulo">{pedido.idosoNome}</Texto>
+          <Texto variante="legenda" cor={cores.textoSuave}>
+            {pedido.origem === 'dispositivo' ? 'Pelo botão em casa' : 'Pelo app'} · {formatarDataHora(pedido.criadoEm)}
+          </Texto>
+        </View>
+      </View>
+      <Texto>{pedido.descricao}</Texto>
+      <View style={[styles.status, { backgroundColor: status.fundo }]}>
+        <Texto variante="destaque" cor={status.cor}>
+          {status.icone} {status.rotulo}
+        </Texto>
+      </View>
+      {pendente ? (
         <View style={styles.acoes}>
           <BotaoGrande
             titulo="Pode seguir"
+            icone="👍"
             variante="sucesso"
             carregando={respondendo}
             onPress={() => aoResponder('aprovado')}
             dica="Avisa que você conferiu e está tudo certo"
           />
           <BotaoGrande
-            titulo="Não faça nada, é golpe"
+            titulo="Pare, é golpe"
+            icone="✋"
             variante="perigo"
             desabilitado={respondendo}
             onPress={() => aoResponder('negado')}
@@ -76,27 +97,20 @@ export function CartaoPedido({
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   cartao: {
     backgroundColor: cores.superficie,
-    borderRadius: raio,
-    borderWidth: 1,
-    borderColor: cores.borda,
+    borderRadius: raio.medio,
+    borderLeftWidth: 8,
     padding: espaco.medio,
     gap: espaco.pequeno,
+    ...sombra,
   },
-  cartaoDestaque: { borderWidth: 2, borderColor: cores.atencao },
-  pressionado: { opacity: 0.8 },
-  titulo: { fontSize: fonte.grande, fontWeight: '700', color: cores.texto },
-  texto: { fontSize: fonte.normal, color: cores.texto, lineHeight: 27 },
-  meta: { fontSize: fonte.pequena, color: cores.textoSuave },
-  status: {
-    alignSelf: 'flex-start',
-    fontSize: fonte.pequena,
-    fontWeight: '700',
-    paddingHorizontal: espaco.pequeno,
-    paddingVertical: espaco.xs,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  acoes: { gap: espaco.pequeno, marginTop: espaco.pequeno },
+  pressionado: { opacity: 0.85, transform: [{ scale: 0.99 }] },
+  linhaTopo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: espaco.medio },
+  seta: { fontSize: 36, color: cores.bordaForte, lineHeight: 38 },
+  avatar: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
+  avatarIcone: { fontSize: 28 },
+  status: { alignSelf: 'flex-start', borderRadius: raio.pequeno, paddingHorizontal: espaco.medio, paddingVertical: espaco.pequeno },
+  acoes: { gap: espaco.medio, marginTop: espaco.pequeno },
 });

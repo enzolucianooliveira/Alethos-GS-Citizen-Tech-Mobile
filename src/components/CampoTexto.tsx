@@ -1,9 +1,12 @@
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
-import { alturaToque, cores, espaco, fonte, raio } from '../theme';
+import { alturaToque, cores, espaco, familias, fonte, raio } from '../theme';
+import { useTema } from '../theme/useTema';
+import { Texto } from './Texto';
 
 // Reaproveita as props do TextInput (placeholder, maxLength...) e acrescenta
-// rótulo e erro. `Omit` tira as que este componente controla.
+// rótulo, ajuda e erro. `Omit` tira as que este componente controla.
 export interface CampoTextoProps extends Omit<TextInputProps, 'value' | 'onChangeText' | 'style'> {
   rotulo: string;
   valor: string;
@@ -12,26 +15,43 @@ export interface CampoTextoProps extends Omit<TextInputProps, 'value' | 'onChang
   ajuda?: string;
 }
 
-export function CampoTexto({ rotulo, valor, aoMudar, erro, ajuda, multiline, ...resto }: CampoTextoProps) {
+export function CampoTexto({ rotulo, valor, aoMudar, erro, ajuda, multiline, onFocus, onBlur, ...resto }: CampoTextoProps) {
+  const tema = useTema();
+  const [focado, setFocado] = useState(false);
+  const corBorda = erro ? cores.perigo : focado ? tema.principal : cores.bordaForte;
+
   return (
     <View style={styles.grupo}>
-      <Text style={styles.rotulo}>{rotulo}</Text>
-      {ajuda ? <Text style={styles.ajuda}>{ajuda}</Text> : null}
+      <Texto variante="destaque">{rotulo}</Texto>
+      {ajuda ? <Texto variante="legenda" cor={cores.textoSuave}>{ajuda}</Texto> : null}
       <TextInput
         {...resto}
         value={valor}
         onChangeText={aoMudar}
         multiline={multiline}
+        onFocus={(e) => {
+          setFocado(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocado(false);
+          onBlur?.(e);
+        }}
         accessibilityLabel={rotulo}
         accessibilityHint={erro}
-        placeholderTextColor={cores.textoSuave}
+        placeholderTextColor="#8C7A6B"
         textAlignVertical={multiline ? 'top' : 'center'}
-        style={[styles.campo, multiline && styles.multilinha, erro ? styles.campoComErro : null]}
+        style={[
+          styles.campo,
+          multiline && styles.multilinha,
+          { borderColor: corBorda },
+          focado && { backgroundColor: tema.claro },
+        ]}
       />
       {erro ? (
-        <Text style={styles.erro} accessibilityLiveRegion="polite">
-          {erro}
-        </Text>
+        <Texto variante="legenda" cor={cores.perigo} style={styles.erro} accessibilityLiveRegion="polite">
+          ✋ {erro}
+        </Texto>
       ) : null}
     </View>
   );
@@ -39,20 +59,17 @@ export function CampoTexto({ rotulo, valor, aoMudar, erro, ajuda, multiline, ...
 
 const styles = StyleSheet.create({
   grupo: { gap: espaco.pequeno },
-  rotulo: { fontSize: fonte.normal, fontWeight: '700', color: cores.texto },
-  ajuda: { fontSize: fonte.pequena, color: cores.textoSuave },
   campo: {
     minHeight: alturaToque,
-    borderWidth: 2,
-    borderColor: cores.borda,
-    borderRadius: raio,
+    borderWidth: 3,
+    borderRadius: raio.medio,
     backgroundColor: cores.superficie,
     paddingHorizontal: espaco.medio,
-    paddingVertical: espaco.pequeno,
+    paddingVertical: espaco.medio,
     fontSize: fonte.normal,
+    fontFamily: familias.corpo,
     color: cores.texto,
   },
-  multilinha: { minHeight: 160 },
-  campoComErro: { borderColor: cores.perigo },
-  erro: { fontSize: fonte.pequena, fontWeight: '600', color: cores.perigo },
+  multilinha: { minHeight: 170 },
+  erro: { fontFamily: familias.corpoNegrito },
 });

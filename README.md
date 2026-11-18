@@ -32,6 +32,12 @@
 - Resultado com veredito (parece golpe, tenha cuidado, parece seguro) e cada sinal de alerta explicado.
 - Botão "Pedir para minha família confirmar", com o status da resposta.
 
+- Botão "Colar mensagem copiada" e leitura do resultado em voz alta.
+
+**Para todos**
+- Tutorial guiado na primeira visita de cada tela: o mascote Gui aparece num balão que aponta para cada parte, explica para que serve e some sozinho em 7 segundos (ou com um toque). O botão "Dicas" mostra tudo de novo.
+- Visual pensado para idosos: fonte Atkinson Hyperlegible (feita para baixa visão), títulos grandes, botões de 64 pontos de altura e uma cor por perfil (laranja para quem confere, roxo para a família).
+
 **Perfil familiar**
 - Lista de pedidos de confirmação, com "Pode seguir" e "Não faça nada, é golpe".
 - Notificação local quando chega um pedido novo, com a permissão tratada (concedida, ainda não perguntada e negada).
@@ -69,20 +75,22 @@ App.tsx                  providers e navegação
 src/
   types/                 modelos do domínio e type guards
   theme/                 cores, fontes e espaçamentos
-  components/            botão, campo, seletor, estados, cartões, layout
+  components/            botão, campo, seletor, estados, cartões, layout, texto
+  components/ilustracoes/ mascote Gui e cenas desenhadas em SVG
   contexts/              usuário identificado (Context API)
+  tutorial/              balões guiados: provider, alvos e os textos de cada tela
   hooks/                 carregamento genérico e permissão de notificação
   navigation/            stack e tipos das rotas
   screens/               as cinco telas
   services/              api (mock ou HTTP), analisador de sinais, notificações, config
-  storage/               leitura e gravação do usuário no AsyncStorage
+  storage/               usuário e tutoriais vistos, no AsyncStorage
   validation/            validações puras dos formulários
   utils/                 erros, datas e textos
 ```
 
 ## Tecnologias
 
-React Native 0.88, Expo SDK 58, TypeScript em modo estrito, React Navigation (Native Stack), AsyncStorage e expo-notifications.
+React Native, Expo SDK 58, TypeScript em modo estrito, React Navigation (Native Stack), AsyncStorage, expo-notifications, react-native-svg, expo-linear-gradient, expo-font (Atkinson Hyperlegible e Baloo 2), expo-speech e expo-clipboard. Todos os módulos nativos usados já vêm no Expo Go.
 
 ## Contrato esperado da API
 

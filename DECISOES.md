@@ -26,8 +26,21 @@ O familiar recebe uma notificação local quando surge um pedido novo. Push remo
 
 **Limitação assumida:** a consulta só acontece com o app aberto. Para avisar com o app fechado seria preciso push e um development build, o que ficou fora do escopo.
 
-## Acessibilidade para idosos
-Fontes de 16 a 28, botões com pelo menos 60 de altura, contraste alto, uma ação principal por tela, rótulos de acessibilidade e mensagens de erro que dizem o que fazer. Cores e tamanhos ficam em `src/theme/` para manter o padrão em todo o app.
+## Identidade visual pensada para idosos
+- **Fontes:** Atkinson Hyperlegible no texto, criada pelo Braille Institute para baixa visão (I, l e 1 não se confundem, o zero é cortado). Baloo 2 nos títulos, arredondada e forte.
+- **Cores por perfil:** laranja para quem confere mensagens e roxo para a família. A pessoa sabe "onde está" só pela cor. O resultado usa vermelho, amarelo e verde, como um semáforo.
+- **Ilustrações próprias em SVG:** o mascote Gui, o celular com alerta e a família foram desenhados em código. São vetores, então ficam nítidos em qualquer tela, não pesam e não dependem de imagens de terceiros.
+- **Toque fácil:** botões com 64 pontos de altura e um "degrau" embaixo, que deixa claro que são apertáveis. Emojis nos sinais e nas opções ajudam quem lê com dificuldade.
+- Tudo fica em `src/theme/`, e o texto passa pelo componente `Texto`, para o padrão valer no app inteiro.
+
+## Tutorial guiado (estilo jogo)
+Na primeira visita de cada tela, o fundo escurece, um recorte ilumina a parte explicada e o Gui aparece num balão com uma seta apontando para ela. Cada dica some sozinha em 7 segundos, com uma barrinha mostrando o tempo, e passa na hora com um toque. Há "Pular", "Ouvir" (lê a dica em voz alta) e o botão "Dicas" para rever.
+- As telas só marcam as partes com `<AlvoTutorial id="...">`; os textos ficam em arrays em `src/tutorial/passos.ts`. Mudar uma dica não exige mexer em tela nenhuma.
+- A posição é medida com `measureInWindow`. Se a parte estiver fora da tela, o balão aparece no centro. Passos marcados como opcionais são pulados quando a parte não existe naquele momento.
+- O que já foi visto fica salvo no AsyncStorage, para não repetir a cada abertura.
+
+## Voz e colar
+"Ouvir em voz alta" (expo-speech) lê o resultado para quem tem dificuldade de leitura. "Colar mensagem copiada" (expo-clipboard) evita o gesto de segurar o dedo no campo, que muitos idosos não conhecem. Nenhum dos dois pede permissão.
 
 ## Privacidade
 O celular guarda apenas nome e perfil. O app nunca pede senha, CPF ou dados bancários.

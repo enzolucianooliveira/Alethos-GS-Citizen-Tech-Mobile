@@ -6,18 +6,28 @@
 // Assim, para criar uma opção nova, basta acrescentar um item no array.
 
 export const PERFIS = [
-  { valor: 'idoso', rotulo: 'Quero analisar mensagens' },
-  { valor: 'familiar', rotulo: 'Quero ajudar um familiar' },
+  {
+    valor: 'idoso',
+    rotulo: 'Quero conferir mensagens',
+    descricao: 'Recebi algo estranho e quero saber se é golpe.',
+    icone: '🧓',
+  },
+  {
+    valor: 'familiar',
+    rotulo: 'Quero proteger minha família',
+    descricao: 'Vou confirmar os pedidos de quem eu ajudo.',
+    icone: '🛡️',
+  },
 ] as const;
 export type Perfil = (typeof PERFIS)[number]['valor'];
 
 export const ORIGENS = [
-  { valor: 'whatsapp', rotulo: 'WhatsApp' },
-  { valor: 'sms', rotulo: 'SMS' },
-  { valor: 'ligacao', rotulo: 'Ligação' },
-  { valor: 'rede_social', rotulo: 'Rede social' },
-  { valor: 'email', rotulo: 'E-mail' },
-  { valor: 'outro', rotulo: 'Outro' },
+  { valor: 'whatsapp', rotulo: 'WhatsApp', icone: '💬' },
+  { valor: 'sms', rotulo: 'SMS', icone: '✉️' },
+  { valor: 'ligacao', rotulo: 'Ligação', icone: '📞' },
+  { valor: 'rede_social', rotulo: 'Rede social', icone: '👥' },
+  { valor: 'email', rotulo: 'E-mail', icone: '📧' },
+  { valor: 'outro', rotulo: 'Outro', icone: '❔' },
 ] as const;
 export type Origem = (typeof ORIGENS)[number]['valor'];
 

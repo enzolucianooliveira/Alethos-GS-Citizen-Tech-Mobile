@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
 import { BotaoGrande } from '../components/BotaoGrande';
 import { CampoTexto } from '../components/CampoTexto';
-import { Paragrafo, TelaRolavel } from '../components/Layout';
+import { Gui } from '../components/ilustracoes/Gui';
+import { Bloco, Cabecalho, TelaRolavel } from '../components/Layout';
 import { SeletorOpcoes } from '../components/SeletorOpcoes';
+import { Texto } from '../components/Texto';
 import { useUsuario } from '../contexts/UsuarioContext';
-import { cores, espaco, fonte } from '../theme';
+import { cores } from '../theme';
+import { AlvoTutorial } from '../tutorial/AlvoTutorial';
+import { useTutorialDaTela } from '../tutorial/useTutorialDaTela';
 import { PERFIS } from '../types';
 import { mensagemDeErro } from '../utils';
 import {
@@ -19,6 +22,7 @@ import {
 
 export function IdentificacaoScreen() {
   const { entrar } = useUsuario();
+  const { rever } = useTutorialDaTela('identificacao');
   const [dados, setDados] = useState<DadosIdentificacao>({ nome: '', perfil: null });
   const [erros, setErros] = useState<ErrosDe<DadosIdentificacao>>({});
   const [enviando, setEnviando] = useState(false);
@@ -47,49 +51,54 @@ export function IdentificacaoScreen() {
   }
 
   return (
-    <TelaRolavel>
-      <View style={styles.cabecalho}>
-        <Text style={styles.titulo} accessibilityRole="header">
-          Desconfie antes de agir
-        </Text>
-        <Paragrafo>
-          Recebeu uma mensagem estranha pedindo dinheiro, senha ou pressa? Cole aqui e veja os sinais de
-          golpe. Antes de transferir, peça para sua família confirmar.
-        </Paragrafo>
-      </View>
+    <TelaRolavel
+      topo={
+        <Cabecalho
+          semBarra
+          titulo="Antigolpe"
+          subtitulo="Desconfie antes de agir. Confira a mensagem e chame a família antes de mandar dinheiro."
+          ilustracao={<Gui tamanho={104} />}
+          aoPedirDicas={rever}
+        />
+      }
+    >
+      <AlvoTutorial id="campo-nome">
+        <CampoTexto
+          rotulo="Como podemos chamar você?"
+          valor={dados.nome}
+          aoMudar={(nome) => alterar('nome', nome)}
+          onBlur={() => setErros(validarIdentificacao(dados))}
+          erro={erros.nome}
+          placeholder="Ex.: Maria"
+          maxLength={LIMITES_NOME.maximo}
+          autoCapitalize="words"
+          autoComplete="name"
+          returnKeyType="done"
+        />
+      </AlvoTutorial>
 
-      <CampoTexto
-        rotulo="Como podemos chamar você?"
-        valor={dados.nome}
-        aoMudar={(nome) => alterar('nome', nome)}
-        onBlur={() => setErros(validarIdentificacao(dados))}
-        erro={erros.nome}
-        placeholder="Ex.: Maria"
-        maxLength={LIMITES_NOME.maximo}
-        autoCapitalize="words"
-        autoComplete="name"
-        returnKeyType="done"
-      />
+      <AlvoTutorial id="escolha-perfil">
+        <SeletorOpcoes
+          rotulo="Como você vai usar o app?"
+          opcoes={PERFIS}
+          selecionado={dados.perfil}
+          aoSelecionar={(perfil) => alterar('perfil', perfil)}
+          erro={erros.perfil}
+          formato="cartao"
+        />
+      </AlvoTutorial>
 
-      <SeletorOpcoes
-        rotulo="Como você vai usar o app?"
-        opcoes={PERFIS}
-        selecionado={dados.perfil}
-        aoSelecionar={(perfil) => alterar('perfil', perfil)}
-        erro={erros.perfil}
-        emColuna
-      />
+      {erroGeral ? <Texto cor={cores.perigo}>{erroGeral}</Texto> : null}
 
-      {erroGeral ? <Text style={styles.erroGeral}>{erroGeral}</Text> : null}
+      <AlvoTutorial id="botao-continuar">
+        <BotaoGrande titulo="Continuar" icone="👉" onPress={() => void continuar()} carregando={enviando} />
+      </AlvoTutorial>
 
-      <BotaoGrande titulo="Continuar" onPress={() => void continuar()} carregando={enviando} />
-      <Paragrafo suave>Seu nome fica salvo só neste celular. Não pedimos senha, CPF nem dados do banco.</Paragrafo>
+      <Bloco>
+        <Texto variante="legenda" cor={cores.textoSuave}>
+          🔒 Seu nome fica salvo só neste celular. Nunca pedimos senha, CPF ou dados do banco.
+        </Texto>
+      </Bloco>
     </TelaRolavel>
   );
 }
-
-const styles = StyleSheet.create({
-  cabecalho: { gap: espaco.pequeno },
-  titulo: { fontSize: fonte.titulo, fontWeight: '800', color: cores.primario },
-  erroGeral: { fontSize: fonte.normal, color: cores.perigo, fontWeight: '600' },
-});

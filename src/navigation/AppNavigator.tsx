@@ -12,49 +12,56 @@ import { HistoricoScreen } from '../screens/HistoricoScreen';
 import { IdentificacaoScreen } from '../screens/IdentificacaoScreen';
 import { NovaAnaliseScreen } from '../screens/NovaAnaliseScreen';
 import { PedidosScreen } from '../screens/PedidosScreen';
-import { cores, fonte } from '../theme';
+import { cores, familias, fonte } from '../theme';
+import { useTema } from '../theme/useTema';
 import type { RootStackParamList } from './tipos';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const tema: Theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: cores.primario,
-    background: cores.fundo,
-    card: cores.superficie,
-    text: cores.texto,
-    border: cores.borda,
-  },
-};
+// Telas com cabeçalho colorido próprio escondem a barra padrão.
+const SEM_BARRA = { headerShown: false } as const;
 
 export function AppNavigator() {
   const { usuario, carregando } = useUsuario();
+  const tema = useTema();
 
   // Enquanto lê o AsyncStorage, não mostra nenhuma tela (evita "piscar" a identificação).
   if (carregando) return <EstadoCarregando mensagem="Abrindo..." />;
 
+  const temaNavegacao: Theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: tema.principal,
+      background: tema.fundo[0],
+      card: tema.principal,
+      text: cores.branco,
+      border: tema.escuro,
+    },
+  };
+
   return (
-    <NavigationContainer theme={tema}>
+    <NavigationContainer theme={temaNavegacao}>
       <Stack.Navigator
         screenOptions={{
-          headerTitleStyle: { fontSize: fonte.grande, fontWeight: '700' },
-          headerTintColor: cores.primario,
+          headerStyle: { backgroundColor: tema.principal },
+          headerTintColor: cores.branco,
+          headerTitleStyle: { fontFamily: familias.titulo, fontSize: fonte.grande },
           headerBackTitle: 'Voltar',
-          contentStyle: { backgroundColor: cores.fundo },
+          headerShadowVisible: false,
+          contentStyle: { backgroundColor: tema.fundo[0] },
         }}
       >
         {usuario === null ? (
-          <Stack.Screen name="Identificacao" component={IdentificacaoScreen} options={{ title: 'Bem-vindo' }} />
+          <Stack.Screen name="Identificacao" component={IdentificacaoScreen} options={SEM_BARRA} />
         ) : usuario.perfil === 'idoso' ? (
           <>
-            <Stack.Screen name="Historico" component={HistoricoScreen} options={{ title: 'Minhas análises' }} />
-            <Stack.Screen name="NovaAnalise" component={NovaAnaliseScreen} options={{ title: 'Analisar mensagem' }} />
+            <Stack.Screen name="Historico" component={HistoricoScreen} options={SEM_BARRA} />
+            <Stack.Screen name="NovaAnalise" component={NovaAnaliseScreen} options={{ title: 'Conferir mensagem' }} />
             <Stack.Screen name="DetalheAnalise" component={DetalheAnaliseScreen} options={{ title: 'Resultado' }} />
           </>
         ) : (
-          <Stack.Screen name="Pedidos" component={PedidosScreen} options={{ title: 'Pedidos da família' }} />
+          <Stack.Screen name="Pedidos" component={PedidosScreen} options={SEM_BARRA} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

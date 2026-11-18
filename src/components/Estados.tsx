@@ -1,36 +1,59 @@
 // Os três estados de qualquer tela que busca dados, em um lugar só.
+// O mascote Gui aparece em cada um, para a tela nunca ficar "vazia".
 
 import type { ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { cores, espaco, fonte } from '../theme';
+import { cores, espaco } from '../theme';
+import { useTema } from '../theme/useTema';
 import type { EstadoTela } from '../types';
 import { BotaoGrande } from './BotaoGrande';
+import { Gui } from './ilustracoes/Gui';
+import { FundoColorido } from './Layout';
+import { Texto } from './Texto';
 
 export function EstadoCarregando({ mensagem = 'Carregando...' }: { mensagem?: string }) {
+  const tema = useTema();
   return (
-    <View style={styles.centro} accessibilityLiveRegion="polite">
-      <ActivityIndicator size="large" color={cores.primario} />
-      <Text style={styles.texto}>{mensagem}</Text>
-    </View>
+    <FundoColorido>
+      <View style={styles.centro} accessibilityLiveRegion="polite">
+        <Gui tamanho={110} />
+        <ActivityIndicator size="large" color={tema.principal} />
+        <Texto variante="destaque" cor={cores.textoSuave} centro>
+          {mensagem}
+        </Texto>
+      </View>
+    </FundoColorido>
   );
 }
 
 export function EstadoErro({ mensagem, aoTentarDeNovo }: { mensagem: string; aoTentarDeNovo: () => void }) {
   return (
-    <View style={styles.centro} accessibilityLiveRegion="assertive">
-      <Text style={styles.titulo}>Algo deu errado</Text>
-      <Text style={styles.texto}>{mensagem}</Text>
-      <BotaoGrande titulo="Tentar de novo" onPress={aoTentarDeNovo} />
-    </View>
+    <FundoColorido>
+      <View style={styles.centro} accessibilityLiveRegion="assertive">
+        <Gui tamanho={110} humor="alerta" />
+        <Texto variante="titulo" centro>
+          Opa, algo deu errado
+        </Texto>
+        <Texto cor={cores.textoSuave} centro>
+          {mensagem}
+        </Texto>
+        <BotaoGrande titulo="Tentar de novo" icone="🔄" onPress={aoTentarDeNovo} />
+      </View>
+    </FundoColorido>
   );
 }
 
-export function EstadoVazio({ titulo, mensagem }: { titulo: string; mensagem: string }) {
+export function EstadoVazio({ titulo, mensagem, ilustracao }: { titulo: string; mensagem: string; ilustracao?: ReactNode }) {
   return (
-    <View style={styles.centro}>
-      <Text style={styles.titulo}>{titulo}</Text>
-      <Text style={styles.texto}>{mensagem}</Text>
+    <View style={styles.vazio}>
+      {ilustracao ?? <Gui tamanho={96} />}
+      <Texto variante="subtitulo" centro>
+        {titulo}
+      </Texto>
+      <Texto cor={cores.textoSuave} centro>
+        {mensagem}
+      </Texto>
     </View>
   );
 }
@@ -61,11 +84,10 @@ export function ConteudoComEstado<T>({
 const styles = StyleSheet.create({
   centro: {
     flexGrow: 1,
-    alignItems: 'stretch',
+    alignItems: 'center',
     justifyContent: 'center',
     gap: espaco.medio,
     padding: espaco.grande,
   },
-  titulo: { fontSize: fonte.grande, fontWeight: '700', color: cores.texto, textAlign: 'center' },
-  texto: { fontSize: fonte.normal, color: cores.textoSuave, textAlign: 'center', lineHeight: 27 },
+  vazio: { alignItems: 'center', gap: espaco.pequeno, paddingVertical: espaco.grande, paddingHorizontal: espaco.medio },
 });
