@@ -9,7 +9,6 @@
 | Cidadão beneficiado | Idosos que usam celular e suas famílias |
 | Problema | Idosos recebem mensagens de golpe (falso parente, falsa central, link falso) e não têm a quem perguntar na hora de decidir se transferem dinheiro. |
 | Como funciona | O idoso cola a mensagem suspeita e vê os sinais de golpe explicados em linguagem simples. Antes de transferir, pede confirmação à família pelo app ou por um botão físico (ESP32). O familiar recebe o aviso e responde "pode seguir" ou "não faça nada". |
-| Indicador de impacto | *(ex.: % de mensagens de golpe identificadas nos testes; pedidos negados que evitaram transferência)* |
 | ODS | 10 (inclusão digital de idosos), 4 (letramento digital), 11 (comunidades seguras) |
 | Repositório | https://github.com/enzolucianooliveira/GS-Fiap-Citizen-Tech-Mobile |
 
