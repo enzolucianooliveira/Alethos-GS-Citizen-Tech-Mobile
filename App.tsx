@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { MolduraWeb } from './src/components/MolduraWeb';
 import { UsuarioProvider } from './src/contexts/UsuarioContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { configurarNotificacoes } from './src/services/notificacoes';
@@ -29,9 +30,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <UsuarioProvider>
-        <TutorialProvider>
-          <AppNavigator />
-        </TutorialProvider>
+        <MolduraWeb>
+          <TutorialProvider>
+            <AppNavigator />
+          </TutorialProvider>
+        </MolduraWeb>
         <StatusBar style="light" />
       </UsuarioProvider>
     </SafeAreaProvider>

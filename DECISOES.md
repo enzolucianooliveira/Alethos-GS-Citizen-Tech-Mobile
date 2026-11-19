@@ -46,6 +46,12 @@ Na primeira visita de cada tela, o fundo escurece, um recorte ilumina a parte ex
 - A posição é medida com `measureInWindow`. Se a parte estiver fora da tela, o balão aparece no centro. Passos marcados como opcionais são pulados quando a parte não existe naquele momento.
 - O que já foi visto fica salvo no AsyncStorage, para não repetir a cada abertura.
 
+## Versão web: site de apresentação
+Idosos quase não usam computador, mas os familiares sim. Por isso a versão web não tenta ser o app esticado na tela: quem abre no navegador vê um site de apresentação do Alethos (o problema com números e fontes, como funciona, os sinais de golpe, os dois perfis, o botão físico, segurança e equipe). O botão "Experimentar" abre o app de verdade numa moldura com largura de celular.
+- Tudo isso fica atrás de `Platform.OS === 'web'` em `src/components/MolduraWeb.tsx`: no Android e no iOS o app continua exatamente igual.
+- Os textos do site ficam em arrays em `src/site/conteudo.ts`, e a lista de sinais vem do próprio analisador, então o site nunca fica desatualizado em relação ao app.
+- O site é gerado junto com o app por `npx expo export --platform web`, e a pasta resultante pode ser hospedada no IIS.
+
 ## Voz e colar
 "Ouvir em voz alta" (expo-speech) lê o resultado para quem tem dificuldade de leitura. "Colar mensagem copiada" (expo-clipboard) evita o gesto de segurar o dedo no campo, que muitos idosos não conhecem. Nenhum dos dois pede permissão.
 
