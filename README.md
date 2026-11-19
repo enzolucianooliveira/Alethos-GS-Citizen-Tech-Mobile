@@ -9,7 +9,7 @@
 | Cidadão beneficiado | Idosos que usam celular e suas famílias |
 | Problema | Idosos recebem mensagens de golpe (falso parente, falsa central, link falso) e não têm a quem perguntar na hora de decidir se transferem dinheiro. |
 | Como funciona | O idoso cola a mensagem suspeita e vê os sinais de golpe explicados em linguagem simples. Antes de transferir, pede confirmação à família pelo app ou por um botão físico (ESP32). O familiar recebe o aviso e responde "pode seguir" ou "não faça nada". |
-| Indicador de impacto | 78; |
+| Indicador de impacto | *(ex.: % de mensagens de golpe identificadas nos testes; pedidos negados que evitaram transferência)* |
 | ODS | 10 (inclusão digital de idosos), 4 (letramento digital), 11 (comunidades seguras) |
 | Repositório | https://github.com/enzolucianooliveira/GS-Fiap-Citizen-Tech-Mobile |
 
@@ -30,8 +30,7 @@
 - Histórico das mensagens analisadas, com estados de carregando, erro e vazio.
 - Formulário validado para analisar uma mensagem nova (texto e por onde chegou).
 - Resultado com veredito (parece golpe, tenha cuidado, parece seguro) e cada sinal de alerta explicado.
-- Botão "Pedir para minha família confirmar", com o status da resposta.
-
+- Botão "Chamar minha família", com o status da resposta.
 - Botão "Colar mensagem copiada" e leitura do resultado em voz alta.
 
 **Para todos**
@@ -39,7 +38,7 @@
 - Visual pensado para idosos: fonte Atkinson Hyperlegible (feita para baixa visão), títulos grandes, botões de 64 pontos de altura e uma cor por perfil (laranja para quem confere, roxo para a família).
 
 **Perfil familiar**
-- Lista de pedidos de confirmação, com "Pode seguir" e "Não faça nada, é golpe".
+- Lista de pedidos de confirmação, com "Pode seguir" e "Pare, é golpe".
 - Notificação local quando chega um pedido novo, com a permissão tratada (concedida, ainda não perguntada e negada).
 - Botão de demonstração que simula o botão físico do ESP32 (só no modo mock).
 
