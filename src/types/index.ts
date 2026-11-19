@@ -44,10 +44,20 @@ export type OrigemPedido = (typeof ORIGENS_PEDIDO)[number];
 
 // ---------- Entidades ----------
 
+/** Quem está usando o app. Nunca carrega o PIN, nem em forma de hash. */
 export interface Usuario {
   id: string;
   nome: string;
+  telefone: string; // só dígitos, com DDD
   perfil: Perfil;
+}
+
+/** O que o formulário de cadastro envia para a API. */
+export interface NovoCadastro {
+  nome: string;
+  telefone: string;
+  perfil: Perfil;
+  pin: string;
 }
 
 /** Um sinal de alerta encontrado na mensagem, com a explicação para o idoso. */

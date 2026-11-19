@@ -1,5 +1,5 @@
-// Navegação em pilha (Native Stack) com fluxo de identificação:
-// sem usuário salvo, só existe a tela de identificação; com usuário,
+// Navegação em pilha (Native Stack) com fluxo de login:
+// sem sessão aberta, só existem Entrar e Cadastro; com sessão,
 // as telas mudam conforme o perfil (idoso ou familiar).
 
 import { DefaultTheme, NavigationContainer, type Theme } from '@react-navigation/native';
@@ -9,7 +9,8 @@ import { EstadoCarregando } from '../components/Estados';
 import { useUsuario } from '../contexts/UsuarioContext';
 import { DetalheAnaliseScreen } from '../screens/DetalheAnaliseScreen';
 import { HistoricoScreen } from '../screens/HistoricoScreen';
-import { IdentificacaoScreen } from '../screens/IdentificacaoScreen';
+import { CadastroScreen } from '../screens/CadastroScreen';
+import { EntrarScreen } from '../screens/EntrarScreen';
 import { NovaAnaliseScreen } from '../screens/NovaAnaliseScreen';
 import { PedidosScreen } from '../screens/PedidosScreen';
 import { cores, familias, fonte } from '../theme';
@@ -53,7 +54,10 @@ export function AppNavigator() {
         }}
       >
         {usuario === null ? (
-          <Stack.Screen name="Identificacao" component={IdentificacaoScreen} options={SEM_BARRA} />
+          <>
+            <Stack.Screen name="Entrar" component={EntrarScreen} options={SEM_BARRA} />
+            <Stack.Screen name="Cadastro" component={CadastroScreen} options={{ title: 'Criar conta' }} />
+          </>
         ) : usuario.perfil === 'idoso' ? (
           <>
             <Stack.Screen name="Historico" component={HistoricoScreen} options={SEM_BARRA} />

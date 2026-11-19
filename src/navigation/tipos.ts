@@ -4,7 +4,8 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
-  Identificacao: undefined;
+  Entrar: undefined;
+  Cadastro: undefined;
   Historico: undefined;
   NovaAnalise: undefined;
   DetalheAnalise: { id: string }; // só o id: a tela busca o resto

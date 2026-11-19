@@ -5,6 +5,16 @@ export class ErroApp extends Error {
   constructor(mensagemAmigavel: string) {
     super(mensagemAmigavel);
     this.name = 'ErroApp';
+    // Garante que `instanceof` funcione em qualquer motor JavaScript ao estender Error.
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+/** Telefone ou PIN errados: a tela de entrada conta essas tentativas. */
+export class ErroCredenciais extends ErroApp {
+  constructor() {
+    super('Telefone ou PIN incorreto. Confira e tente de novo.');
+    this.name = 'ErroCredenciais';
   }
 }
 
@@ -32,6 +42,34 @@ export function formatarDataHora(iso: string): string {
   const dia = `${doisDigitos(data.getDate())}/${doisDigitos(data.getMonth() + 1)}/${data.getFullYear()}`;
   const hora = `${doisDigitos(data.getHours())}:${doisDigitos(data.getMinutes())}`;
   return `${dia} às ${hora}`;
+}
+
+/** "20:45:12": só o horário, com segundos (para mostrar a última verificação). */
+export function formatarHora(iso: string): string {
+  const data = new Date(iso);
+  if (Number.isNaN(data.getTime())) return '';
+  return [data.getHours(), data.getMinutes(), data.getSeconds()].map(doisDigitos).join(':');
+}
+
+/** Tira tudo que não é número: "(11) 98888-0001" vira "11988880001". */
+export function apenasDigitos(texto: string): string {
+  return texto.replace(/\D/g, '');
+}
+
+/** Formata enquanto a pessoa digita: "11988880001" vira "(11) 98888-0001". */
+export function formatarTelefone(texto: string): string {
+  const d = apenasDigitos(texto).slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : '';
+  const ddd = d.slice(0, 2);
+  const resto = d.slice(2);
+  const corte = d.length === 11 ? 5 : 4; // celular tem 9 dígitos, fixo tem 8
+  return resto.length <= corte ? `(${ddd}) ${resto}` : `(${ddd}) ${resto.slice(0, corte)}-${resto.slice(corte)}`;
+}
+
+/** Esconde o meio do número para mostrar na tela: "(11) •••••-0001". */
+export function mascararTelefone(texto: string): string {
+  const d = apenasDigitos(texto);
+  return d.length < 6 ? d : `(${d.slice(0, 2)}) ${'•'.repeat(d.length - 6)}-${d.slice(-4)}`;
 }
 
 /** Corta um texto longo e acrescenta reticências. */

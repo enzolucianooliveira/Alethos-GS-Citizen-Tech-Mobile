@@ -2,13 +2,20 @@
 // Cada resposta chega como `unknown` e só é usada depois de passar pelo guard
 // do tipo esperado. Assim o app nunca confia cegamente no JSON recebido.
 
-import type { Analise, NovaAnalise, NovoPedido, Pedido, RespostaPedido } from '../types';
-import { ehAnalise, ehListaDe, ehPedido } from '../types/guards';
-import { ErroApp } from '../utils';
+import type { Analise, NovaAnalise, NovoCadastro, NovoPedido, Pedido, RespostaPedido } from '../types';
+import { ehAnalise, ehListaDe, ehPedido, ehUsuario } from '../types/guards';
+import { apenasDigitos, ErroApp, ErroCredenciais } from '../utils';
 import { TEMPO_LIMITE_MS, URL_API } from './config';
 import type { ApiCliente } from './tipos';
 
 type Guard<T> = (valor: unknown) => valor is T;
+
+/** Mensagens amigáveis para os erros mais comuns da API. */
+const MENSAGENS_POR_STATUS: Record<number, string> = {
+  404: 'Não encontrei o que você procurava.',
+  409: 'Este telefone já tem conta. Volte e toque em Entrar.',
+  429: 'Muitas tentativas seguidas. Espere um pouco e tente de novo.',
+};
 
 /** Uma única função faz todas as requisições: tempo limite, erros e validação. */
 async function requisitar<T>(caminho: string, ehValido: Guard<T>, opcoes: RequestInit = {}): Promise<T> {
@@ -29,7 +36,9 @@ async function requisitar<T>(caminho: string, ehValido: Guard<T>, opcoes: Reques
   }
 
   // fetch NÃO dá erro em 404 ou 500: é preciso conferir `ok` manualmente.
-  if (resposta.status === 404) throw new ErroApp('Não encontrei o que você procurava.');
+  if (resposta.status === 401) throw new ErroCredenciais();
+  const mensagem = MENSAGENS_POR_STATUS[resposta.status];
+  if (mensagem) throw new ErroApp(mensagem);
   if (!resposta.ok) throw new ErroApp(`O servidor respondeu com erro (${resposta.status}).`);
 
   const corpo: unknown = await resposta.json();
@@ -46,6 +55,12 @@ const ehListaDeAnalises = ehListaDe(ehAnalise);
 const ehListaDePedidos = ehListaDe(ehPedido);
 
 export const httpApi: ApiCliente = {
+  cadastrar: (dados: NovoCadastro) =>
+    requisitar('/usuarios', ehUsuario, comCorpo('POST', { ...dados, telefone: apenasDigitos(dados.telefone) })),
+
+  autenticar: (telefone: string, pin: string) =>
+    requisitar('/sessoes', ehUsuario, comCorpo('POST', { telefone: apenasDigitos(telefone), pin })),
+
   listarAnalises: (usuarioId) =>
     requisitar(`/analises?usuarioId=${encodeURIComponent(usuarioId)}`, ehListaDeAnalises),
 

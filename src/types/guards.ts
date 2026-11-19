@@ -51,7 +51,13 @@ export function ehListaDe<T>(ehItem: (valor: unknown) => valor is T) {
 }
 
 export function ehUsuario(valor: unknown): valor is Usuario {
-  return ehObjeto(valor) && ehTexto(valor.id) && ehTexto(valor.nome) && ehPerfil(valor.perfil);
+  return (
+    ehObjeto(valor) &&
+    ehTexto(valor.id) &&
+    ehTexto(valor.nome) &&
+    ehTexto(valor.telefone) &&
+    ehPerfil(valor.perfil)
+  );
 }
 
 export function ehSinal(valor: unknown): valor is Sinal {

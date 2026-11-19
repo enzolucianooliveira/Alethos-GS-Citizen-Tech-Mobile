@@ -1,5 +1,5 @@
 // Os três estados de qualquer tela que busca dados, em um lugar só.
-// O mascote Gui aparece em cada um, para a tela nunca ficar "vazia".
+// O mascote Alethos aparece em cada um, para a tela nunca ficar "vazia".
 
 import type { ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';

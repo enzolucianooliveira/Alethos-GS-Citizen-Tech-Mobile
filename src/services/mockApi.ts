@@ -4,26 +4,53 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { Analise, NovaAnalise, NovoPedido, Pedido, RespostaPedido } from '../types';
-import { ehAnalise, ehListaDe, ehObjeto, ehPedido } from '../types/guards';
-import { agoraIso, ErroApp, esperar, gerarId } from '../utils';
+import type { Analise, NovaAnalise, NovoCadastro, NovoPedido, Pedido, RespostaPedido, Usuario } from '../types';
+import { ehAnalise, ehListaDe, ehObjeto, ehPedido, ehUsuario } from '../types/guards';
+import { agoraIso, apenasDigitos, ErroApp, ErroCredenciais, esperar, gerarId } from '../utils';
 import { analisarTexto } from './analisador';
 import { ATRASO_MOCK_MS, SIMULAR_FALHA } from './config';
+import { gerarSal, hashDoPin } from './seguranca';
 import type { ApiCliente } from './tipos';
 
 const CHAVE_BANCO = '@alethos/banco-mock/v1';
 
+/** Como a conta fica guardada: o PIN só existe como hash, junto com o sal. */
+interface UsuarioGuardado extends Usuario {
+  sal: string;
+  pinHash: string;
+  criadoEm: string;
+}
+
 interface Banco {
+  usuarios: UsuarioGuardado[];
   analises: Analise[];
   pedidos: Pedido[];
 }
 
-const BANCO_VAZIO: Banco = { analises: [], pedidos: [] };
+const BANCO_VAZIO: Banco = { usuarios: [], analises: [], pedidos: [] };
+
+function ehUsuarioGuardado(valor: unknown): valor is UsuarioGuardado {
+  return (
+    ehUsuario(valor) &&
+    ehObjeto(valor) &&
+    typeof valor.sal === 'string' &&
+    typeof valor.pinHash === 'string' &&
+    typeof valor.criadoEm === 'string'
+  );
+}
 
 function ehBanco(valor: unknown): valor is Banco {
   return (
-    ehObjeto(valor) && ehListaDe(ehAnalise)(valor.analises) && ehListaDe(ehPedido)(valor.pedidos)
+    ehObjeto(valor) &&
+    ehListaDe(ehUsuarioGuardado)(valor.usuarios) &&
+    ehListaDe(ehAnalise)(valor.analises) &&
+    ehListaDe(ehPedido)(valor.pedidos)
   );
+}
+
+/** Devolve só os dados públicos da conta: sal e hash nunca saem do "servidor". */
+function publico({ id, nome, telefone, perfil }: UsuarioGuardado): Usuario {
+  return { id, nome, telefone, perfil };
 }
 
 async function lerBanco(): Promise<Banco> {
@@ -56,6 +83,39 @@ const maisRecentePrimeiro =
     data(b).localeCompare(data(a));
 
 export const mockApi: ApiCliente = {
+  async cadastrar(dados: NovoCadastro) {
+    await simularRede(false);
+    const banco = await lerBanco();
+    const telefone = apenasDigitos(dados.telefone);
+    if (banco.usuarios.some((u) => u.telefone === telefone)) {
+      throw new ErroApp('Este telefone já tem conta. Volte e toque em Entrar.');
+    }
+    const sal = gerarSal();
+    const novo: UsuarioGuardado = {
+      id: gerarId(),
+      nome: dados.nome.trim(),
+      telefone,
+      perfil: dados.perfil,
+      sal,
+      pinHash: await hashDoPin(sal, dados.pin),
+      criadoEm: agoraIso(),
+    };
+    await gravarBanco({ ...banco, usuarios: [...banco.usuarios, novo] });
+    return publico(novo);
+  },
+
+  async autenticar(telefone, pin) {
+    await simularRede(false);
+    const { usuarios } = await lerBanco();
+    const conta = usuarios.find((u) => u.telefone === apenasDigitos(telefone));
+    // A mesma mensagem para "telefone não existe" e "PIN errado": assim ninguém
+    // descobre quais telefones têm conta tentando no login.
+    if (!conta || (await hashDoPin(conta.sal, pin)) !== conta.pinHash) {
+      throw new ErroCredenciais();
+    }
+    return publico(conta);
+  },
+
   async listarAnalises(usuarioId) {
     await simularRede(true);
     const { analises } = await lerBanco();

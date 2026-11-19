@@ -48,23 +48,73 @@ export function semErros<T>(erros: ErrosDe<T>): boolean {
   return Object.keys(erros).length === 0;
 }
 
-// ---------- Identificação ----------
+// ---------- Telefone e PIN ----------
+
+const soDigitos = (v: string) => v.replace(/\D/g, '');
+
+/** Telefone com DDD: 10 dígitos (fixo) ou 11 (celular). */
+export const TAMANHOS_TELEFONE = [10, 11] as const;
+export const TAMANHO_PIN = 4;
+
+/** PINs fáceis demais de adivinhar. Para bloquear outro, acrescente aqui. */
+export const PINS_FRACOS = ['0000', '1111', '2222', '3333', '4444', '5555', '6666', '7777', '8888', '9999', '1234', '4321', '0123', '1212'];
+
+const regraTelefone: Regra<string>[] = [
+  obrigatorio('Digite seu telefone com DDD.'),
+  (v) =>
+    (TAMANHOS_TELEFONE as readonly number[]).includes(soDigitos(v).length)
+      ? null
+      : 'Confira o número: são o DDD e mais 8 ou 9 dígitos.',
+];
+
+const regraPin = (mensagemVazio: string): Regra<string>[] => [
+  obrigatorio(mensagemVazio),
+  (v) => (/^\d+$/.test(v) && v.length === TAMANHO_PIN ? null : `O PIN tem ${TAMANHO_PIN} números.`),
+];
+
+// ---------- Cadastro ----------
 
 export const LIMITES_NOME = { minimo: 2, maximo: 60 } as const;
 
-export interface DadosIdentificacao {
+export interface DadosCadastro {
   nome: string;
+  telefone: string;
+  pin: string;
+  confirmacaoPin: string;
   perfil: Perfil | null;
 }
 
-export function validarIdentificacao(dados: DadosIdentificacao): ErrosDe<DadosIdentificacao> {
-  return semVazios<DadosIdentificacao>({
+export function validarCadastro(dados: DadosCadastro): ErrosDe<DadosCadastro> {
+  return semVazios<DadosCadastro>({
     nome: primeiroErro(dados.nome, [
       obrigatorio('Digite seu nome.'),
       minimo(LIMITES_NOME.minimo, 'O nome está muito curto.'),
       maximo(LIMITES_NOME.maximo, `Use no máximo ${LIMITES_NOME.maximo} letras.`),
     ]),
+    telefone: primeiroErro(dados.telefone, regraTelefone),
+    pin: primeiroErro(dados.pin, [
+      ...regraPin(`Crie um PIN de ${TAMANHO_PIN} números.`),
+      (v) => (PINS_FRACOS.includes(v) ? 'Esse PIN é fácil de adivinhar. Escolha outro.' : null),
+    ]),
+    confirmacaoPin: primeiroErro(dados.confirmacaoPin, [
+      obrigatorio('Digite o PIN de novo.'),
+      (v) => (v === dados.pin ? null : 'Os dois PINs não são iguais.'),
+    ]),
     perfil: ehPerfil(dados.perfil) ? undefined : 'Escolha como você vai usar o app.',
+  });
+}
+
+// ---------- Entrada (login) ----------
+
+export interface DadosEntrada {
+  telefone: string;
+  pin: string;
+}
+
+export function validarEntrada(dados: DadosEntrada): ErrosDe<DadosEntrada> {
+  return semVazios<DadosEntrada>({
+    telefone: primeiroErro(dados.telefone, regraTelefone),
+    pin: primeiroErro(dados.pin, regraPin('Digite seu PIN.')),
   });
 }
 

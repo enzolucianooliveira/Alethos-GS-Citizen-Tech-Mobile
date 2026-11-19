@@ -16,25 +16,53 @@ export interface PassoTutorial {
 }
 
 export const TUTORIAIS = {
-  identificacao: [
+  entrar: [
     {
-      titulo: 'Oi! Eu sou o Gui 👋',
-      texto: 'Sou o guardião do Alethos. Vou mostrar rapidinho para que serve cada parte. Toque na tela para passar mais rápido.',
+      titulo: 'Oi! Eu sou o Alethos 👋',
+      texto: 'Sou o seu guardião antigolpe. Vou mostrar rapidinho como entrar. Toque na tela para passar mais rápido.',
     },
     {
-      alvo: 'campo-nome',
+      alvo: 'contas-lembradas',
+      titulo: 'Entrar rápido',
+      texto: 'Quem já entrou neste celular aparece aqui. É só tocar no nome, sem digitar nada.',
+      opcional: true,
+    },
+    {
+      alvo: 'entrar-telefone',
+      titulo: 'Seu telefone',
+      texto: 'Digite o telefone com DDD que você usou para criar a conta.',
+    },
+    {
+      alvo: 'entrar-pin',
+      titulo: 'Seu PIN',
+      texto: 'São 4 números que só você sabe, como a senha do cartão.',
+    },
+    {
+      alvo: 'botao-criar-conta',
+      titulo: 'Primeira vez aqui?',
+      texto: 'Toque em Criar minha conta. Leva menos de um minuto.',
+    },
+  ],
+  cadastro: [
+    {
+      alvo: 'cadastro-nome',
       titulo: 'Seu nome',
-      texto: 'Escreva como quer ser chamado. Ele fica guardado só neste celular.',
+      texto: 'Escreva como quer ser chamado.',
     },
     {
-      alvo: 'escolha-perfil',
+      alvo: 'cadastro-telefone',
+      titulo: 'Seu telefone',
+      texto: 'Ele vai ser o seu login. Use o número com DDD.',
+    },
+    {
+      alvo: 'cadastro-pin',
+      titulo: 'Crie um PIN',
+      texto: 'Escolha 4 números fáceis para você e difíceis para os outros. Evite 1234 ou 0000.',
+    },
+    {
+      alvo: 'cadastro-perfil',
       titulo: 'Quem é você aqui?',
       texto: 'Recebeu algo estranho? Escolha conferir mensagens. Vai ajudar alguém? Escolha proteger a família.',
-    },
-    {
-      alvo: 'botao-continuar',
-      titulo: 'Tudo pronto!',
-      texto: 'Toque em Continuar. Da próxima vez o app já vai lembrar de você.',
     },
   ],
   historico: [

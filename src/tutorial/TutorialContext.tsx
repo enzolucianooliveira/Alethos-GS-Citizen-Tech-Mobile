@@ -1,5 +1,5 @@
 // Tutorial guiado, no estilo de jogo: a tela escurece, um recorte ilumina a
-// parte explicada e o Gui aparece num balão que aponta para ela. Cada dica
+// parte explicada e o mascote Alethos aparece num balão que aponta para ela. Cada dica
 // some sozinha depois de alguns segundos (a barrinha mostra o tempo), ou na
 // hora, com um toque.
 //
